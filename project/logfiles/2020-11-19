@@ -1,0 +1,59 @@
+
+
+	Positions file: tmp/2020-11-19_02_ihplot/01_Region/HsInv0389/PositionInfo.txt
+	Haplotypes file: tmp/2020-11-19_02_ihplot/01_Region/HsInv0389/HaplotypeInfo.txt
+	Samples file: tmp/2020-11-19_02_ihplot/01_Region/HsInv0389/SampleInfo.txt
+	Fraction of chromosomes to define main orientation in a cluster: 0.6
+	Output prefix: tmp/2020-11-19_02_ihplot/02_iHPlots/HsInv0389/
+	Mutations shown in haplotypes: Derived
+	Minimum number of mutations clusters need to have: 91
+
+
+********************************************************
+Note: As of version 1.0.0, cowplot does not change the
+  default ggplot2 theme anymore. To recover the previous
+  behavior, execute:
+  theme_set(theme_cowplot())
+********************************************************
+
+Not a valid number of mutations! Setting it to 0.75*maxHeight
+
+In inversion HsInv0389 the least diverse orientation is Inv.
+Inversion events are going to be counted as the number of clusters where there is at least one Inv chromosome
+null device 
+          1 
+
+
+	Positions file: tmp/2020-11-19_02_ihplot/01_Region/HsInv1057/PositionInfo.txt
+	Haplotypes file: tmp/2020-11-19_02_ihplot/01_Region/HsInv1057/HaplotypeInfo.txt
+	Samples file: tmp/2020-11-19_02_ihplot/01_Region/HsInv1057/SampleInfo.txt
+	Fraction of chromosomes to define main orientation in a cluster: 0.6
+	Output prefix: tmp/2020-11-19_02_ihplot/02_iHPlots/HsInv1057/
+	Mutations shown in haplotypes: Derived
+	Minimum number of mutations clusters need to have: 341
+
+
+********************************************************
+Note: As of version 1.0.0, cowplot does not change the
+  default ggplot2 theme anymore. To recover the previous
+  behavior, execute:
+  theme_set(theme_cowplot())
+********************************************************
+
+In inversion HsInv1057 the least diverse orientation is Inv.
+Inversion events are going to be counted as the number of clusters where there is at least one Inv chromosome
+Warning messages:
+1: In RColorBrewer::brewer.pal(n, pal) :
+  n too large, allowed maximum for palette Accent is 8
+Returning the palette you asked for with that many colors
+
+2: In RColorBrewer::brewer.pal(n, pal) :
+  n too large, allowed maximum for palette Accent is 8
+Returning the palette you asked for with that many colors
+
+3: In RColorBrewer::brewer.pal(n, pal) :
+  n too large, allowed maximum for palette Accent is 8
+Returning the palette you asked for with that many colors
+
+null device 
+          1 

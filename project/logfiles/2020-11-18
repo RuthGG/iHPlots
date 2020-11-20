@@ -1,0 +1,86 @@
+
+ [1mWelcome to  MVNcall v1.0[0m         
+
+ Androniki Menelaou & Jonathan Marchini 
+========================================
+
+
+INPUT PARAMETERS
+Number of flanking sites at either site : 40
+Penalty value lambda                    : 0.06
+Number of MCMC iterations               : 100
+Number of MCMC burn-in iterations       : 10
+
+
+INPUT FILES
+Sample file                : tmp/2020-11-18_01_phase/HsInv0389/sample-file.txt
+Scaffold file              : tmp/2020-11-18_01_phase/HsInv0389/scaffold-file.txt
+Genotype Likelihoods file  : tmp/2020-11-18_01_phase/HsInv0389/gffs-file.txt
+
+
+OUTPUT FILES
+Output vcf file            : analysis/2020-11-18_01_phase/HsInv0389/HsInv0389_phased.vcf
+
+
+READING FILES FROM COMMAND LINE
+Reading sample file : tmp/2020-11-18_01_phase/HsInv0389/sample-file.txt
+Reading vcf file:  tmp/2020-11-18_01_phase/HsInv0389/gffs-file.txt
+Reading haplotype scaffold file : tmp/2020-11-18_01_phase/HsInv0389/scaffold-file.txt
+
+
+INFORMATION
+Number of variants to impute : 1
+
+Analysing variant 1/1
+
+Writing phased genotypes in output files...
+
+Time elapsed : 0.615695
+
+~~~ ΤΕΛΟΣ ~~~ 
+
+Have a nice day!
+
+
+ [1mWelcome to  MVNcall v1.0[0m         
+
+ Androniki Menelaou & Jonathan Marchini 
+========================================
+
+
+INPUT PARAMETERS
+Number of flanking sites at either site : 368
+Penalty value lambda                    : 0.06
+Number of MCMC iterations               : 100
+Number of MCMC burn-in iterations       : 10
+
+
+INPUT FILES
+Sample file                : tmp/2020-11-18_01_phase/HsInv1057/sample-file.txt
+Scaffold file              : tmp/2020-11-18_01_phase/HsInv1057/scaffold-file.txt
+Genotype Likelihoods file  : tmp/2020-11-18_01_phase/HsInv1057/gffs-file.txt
+
+
+OUTPUT FILES
+Output vcf file            : analysis/2020-11-18_01_phase/HsInv1057/HsInv1057_phased.vcf
+
+
+READING FILES FROM COMMAND LINE
+Reading sample file : tmp/2020-11-18_01_phase/HsInv1057/sample-file.txt
+Reading vcf file:  tmp/2020-11-18_01_phase/HsInv1057/gffs-file.txt
+Reading haplotype scaffold file : tmp/2020-11-18_01_phase/HsInv1057/scaffold-file.txt
+
+
+INFORMATION
+Number of variants to impute : 1
+
+Analysing variant 1/1
+
+Writing phased genotypes in output files...
+
+Time elapsed : 101.700772
+
+~~~ ΤΕΛΟΣ ~~~ 
+
+Have a nice day!
+
