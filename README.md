@@ -17,9 +17,7 @@ Give project objective, description and scope
 
 ## Prerequisites
 
-This project should be associated with a conda environment of the same name. To activate it, do:
-
-```conda activate iHPlots```
+This project should be associated with a conda environment, which can be imported from the .yml file in the main directory.
 
 ## Running the tests
 
