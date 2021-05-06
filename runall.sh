@@ -147,13 +147,16 @@ if [ "$COMMAND" == "phase" ]; then
   OUTDIR="analysis/${DATE}_${STEP}_phase"
   mkdir -p "$TMPDIR" "$OUTDIR"
 
-  GENOTYPES="data/use/inversions_info/Genotypes_20062018.txt"
+# OPTION 1
+ GENOTYPES="data/use/inversions_info/Genotypes_20062018.txt"
+#  OPTION 2 
+  # GENOTYPES="data/use/inversions_info/LongGenotypes.txt"
   INVCOORD="data/use/inversions_info/Coordinates_hg19.txt"
   GENOMES="data/raw/1KGP"
   MASK="data/use/Accessibility/20141020.strict_mask.whole_genome.bed"
 
   # LIST SAMPLES
-    SAMPLES_INV=$(cut -f2 $GENOTYPES | tail -n+2)
+
     SAMPLES_REF=$(cut -f1 ${GENOMES}/integrated_call_samples_v3.20130502.ALL.panel | tail -n+2)
     SAMPLES_REF_MALE=$(cut -f1 ${GENOMES}/integrated_call_male_samples_v3.20130502.ALL.panel | tail -n+2)
 
@@ -163,6 +166,14 @@ if [ "$COMMAND" == "phase" ]; then
 
   # FOR EACH INVERSION
     for INV in $INVERSIONS; do
+        # OPTION 1
+    SAMPLES_INV=$(cut -f2 $GENOTYPES | tail -n+2)
+    # OPTION 2  
+    # SAMPLES_INV=$(grep $INV $GENOTYPES | cut -f1  | tail -n+2)
+    # OPTION 3
+    SAMPLES_FILTER=$(cut -f2  data/raw/CarlaExamples/Samples  | tail -n+2)
+    SAMPLES_INV=$(echo "$SAMPLES_INV" "$SAMPLES_FILTER"  | tr " " "\n" | sort | uniq -d)
+   
 
       # PHASE INVERSION - Make MVNcall input
       # --------------------------------------------------------------------------- #
@@ -209,12 +220,20 @@ if [ "$COMMAND" == "phase" ]; then
         # Apply STRICT accessibility mask (or any mask, actually, changing the file)
         bedtools intersect -wa -header -a ${MVN_INPUT}/1kgp_filter.txt -b $MASK |\
           # Also make cusom format
-          bcftools query -H -f'%CHROM\t%ID\t%POS\t%REF\t%ALT[\t%GT]\n'   > ${MVN_INPUT}/1kgp_filter_mask_format.txt 
-      
-      # ALSO PREPARE INPUT FOR A POSSIBLE FUTURE IHPLOT - outside region, unfiltered variants
+        bcftools query -H -f'%CHROM\t%ID\t%POS\t%REF\t%ALT[\t%GT]\n'   > ${MVN_INPUT}/1kgp_filter_mask_format.txt 
+
+       # ---------------------CODE IN TESTING PHASE ---------------------------
+        # TO LIMIT VARIANTS ACCORDING TO EXAMPLE:
+        mv ${MVN_INPUT}/1kgp_filter_mask_format.txt  ${MVN_INPUT}/1kgp_filter_mask_format_unfiltered.txt 
+        cut -f1 data/raw/CarlaExamples/Positions > "${MVN_INPUT}/posfilter.txt"
+        grep -f "${MVN_INPUT}/posfilter.txt" ${MVN_INPUT}/1kgp_filter_mask_format_unfiltered.txt  > ${MVN_INPUT}/1kgp_filter_mask_format.txt
+
+      # -----------------------------------------------------------
+
+        # ALSO PREPARE INPUT FOR A POSSIBLE FUTURE IHPLOT - outside region, unfiltered variants
         TMP=$(echo $SAMPLES_SHARED | tr " " ",")
         echo "CHROM	POS	ID	REF	ALT	VT	AA	${TMP}" | tr "," "	" > ${MVN_OUTPUT}/1KGP_haplotypes.txt
-        bcftools view -r${CHR}:${OUT_START}-${OUT_END} -Ov -s $(echo $SAMPLES_SHARED | tr " " ",")  "${BCF_FILE}" |\
+        bcftools view -r${CHR}:${OUT_START}-${OUT_END} -Ov -v snps -s $(echo $SAMPLES_SHARED | tr " " ",")  "${BCF_FILE}" |\
           bcftools query -f'%CHROM\t%POS\t%ID\t%REF\t%ALT\t%VT\t%AA[\t%GT]\n' >> ${MVN_OUTPUT}/1KGP_haplotypes.txt 
         
 
@@ -246,6 +265,7 @@ if [ "$COMMAND" == "phase" ]; then
         bcftools view -h -s $(echo $SAMPLES_SHARED | tr " " ",") "${GENOMES}/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz" > $GLFS
         
         # Take inversion genotypes from genotypes file only for common individuals
+        # OPTION 1
           #  Which column is the inversion in
           INV_COLUMN=$(head -1 $GENOTYPES | tr "\t" "\n" | cat -n | grep $INV | cut -f1 | tr -d " ")
           # Grep only common individuals, stored in $SAMPLE, format as in VCF
@@ -258,6 +278,12 @@ if [ "$COMMAND" == "phase" ]; then
             sed 's/Inv\/Del/.\/1:-2.70,-0.30,-0.30/g' | \
             # Male genotypes in X format
             sed 's/Std/0\/0:0.00,-5.00,-5.00/g' | sed 's/Inv/1\/1:-5.00,-5.00,0.00/g' > ${MVN_INPUT}/genotypes_selected_vcformatted.txt
+        # OPTION 2
+          #  grep -f $SAMPLE $GENOTYPES | grep $INV | cut -f 1,7 | \
+          #  # Male genotypes in X format
+          #   sed 's/\t0$/\t0\/0/g' | sed 's/\t1$/\t1\/1/g'| \
+          #  # Add genotype likelihoods 
+          #   sed 's/0\/0/0\/0:0.00,-5.00,-5.00/g' | sed 's/1\/1/1\/1:-5.00,-5.00,0.00/g' >  ${MVN_INPUT}/genotypes_selected_vcformatted.txt
 
         # Select inversion position: inv pos should be a position between the two central SNPs, because MVNCall will use the same number of SNPs at either side
           # Set number of snps (useful for later)
@@ -272,11 +298,13 @@ if [ "$COMMAND" == "phase" ]; then
         # Get genotypes sorted the same as in other files
          GENOTYPES_ORDERED=$(for SAMPLE in $SAMPLES_SHARED; do grep "$SAMPLE" ${MVN_INPUT}/genotypes_selected_vcformatted.txt | cut -f2; done)
 
-        # Fill VCF                                            
+        # Fill VCF         
+
         echo -e "${CHR}\t${POSITION}\t${INV}\tA\tT\t.\tPASS\tSTART=${START};END=${END}\tGT:GL\t$(echo ${GENOTYPES_ORDERED} | tr ' ' '\t')" >>${GLFS}
-       
+
       # PHASE INVERSION - Make MVNcall output
       # --------------------------------------------------------------------------- #
+      
 
       # EXECUTE 
         ./code/software/mvncall/mvncall_v1.0_x86_64_dynamic/mvncall \
@@ -327,12 +355,13 @@ if [ "$COMMAND" == "ihplot" ]; then
       CHR=$(grep -e "$INV" $INVCOORD | cut -f2)
       START=$(($(grep -e "${INV}" ${INVCOORD} | cut -f3) + 1))
       END=$(($(grep -e "${INV}" ${INVCOORD} | cut -f6) - 1))
-       
+
     # MAKE NETWORK ANALYSES - Include phased breakpoints into phased 1KGP info
     # --------------------------------------------------------------------------- #
+    
 
     # SET FOLDERS
-      INDIR="analysis/2020-11-19_01_phase/${INV}"
+      INDIR="analysis/2020-11-29_01_phase/${INV}"
       STEPDIR="${TMPDIR}/00_Complete/${INV}"
       mkdir -p ${STEPDIR}
 
@@ -345,13 +374,32 @@ if [ "$COMMAND" == "ihplot" ]; then
     # SCRIPT TO INCLUDE PHASING AND BEAUTIFY
       Rscript code/rscript/TidyHaplotypes.R "${CHR}:${START}" "${CHR}:${END}" ${INDIR}/${INV}_phased.vcf ${INDIR}/1KGP_haplotypes.txt ${ANCORIENT} "${STEPDIR}/"
 
+    # ---------------------CODE IN TESTING PHASE ---------------------------
+    cut -f1 data/raw/CarlaExamples/Positions > "${STEPDIR}/posfilter.txt"
+    cut -f1 data/raw/CarlaExamples/Samples > "${STEPDIR}/samfilter.txt"
+
+    mv ${STEPDIR}/samples.txt ${STEPDIR}/samples_unfiltered.txt 
+    mv ${STEPDIR}/haplotypes.txt ${STEPDIR}/haplotypes_unfiltered.txt 
+    mv ${STEPDIR}/positions.txt ${STEPDIR}/positions_unfiltered.txt 
+
+    head -1 ${STEPDIR}/samples_unfiltered.txt >  ${STEPDIR}/samples.txt
+    head -1 ${STEPDIR}/haplotypes_unfiltered.txt >  ${STEPDIR}/haplotypes.txt
+    head -1 ${STEPDIR}/positions_unfiltered.txt >  ${STEPDIR}/positions.txt
+
+    grep -f ${STEPDIR}/posfilter.txt ${STEPDIR}/positions_unfiltered.txt > ${STEPDIR}/positions.txt
+    grep -f ${STEPDIR}/samfilter.txt ${STEPDIR}/haplotypes_unfiltered.txt >> ${STEPDIR}/haplotypes.txt
+    grep -f ${STEPDIR}/samfilter.txt ${STEPDIR}/samples_unfiltered.txt > ${STEPDIR}/samples.txt
+
+    # ------------------------------------------------
+
+
     # MAKE NETWORK ANALYSES - Remove singletons and trim to include only inside region. Make other input files
     # --------------------------------------------------------------------------- #
 
     # SET FOLDERS
       INDIR=${STEPDIR}
       STEPDIR="${TMPDIR}/01_Region/${INV}"
-      mkdir -p ${STEPDIR}
+      mkdir -p "${STEPDIR}"
 
     # SCRIPT TO TRIM 
       Rscript code/rscript/SelectRegion.R ${INDIR}/positions.txt ${INDIR}/haplotypes.txt ${INDIR}/samples.txt ${MINCOUNT} "${STEPDIR}/" ${FLANKING} 

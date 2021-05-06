@@ -2,10 +2,10 @@
 # Ruth Gómez, based on another script by Carla Giner
 # 19.11.2020
 
-# args = c("6:167610402" , "6:167771360" ,
-#          "analysis/2020-11-19_01_phase/HsInv1057/HsInv1057_phased.vcf",
-#          "analysis/2020-11-19_01_phase/HsInv1057/1KGP_haplotypes.txt",
-#          NA, "tmp/2020-11-19_02_ihplot/HsInv1057/")
+args = c("X:153577719" , "X:153612371" ,
+         "analysis/2020-11-19_01_phase/HsInv0389/HsInv0389_phased.vcf",
+         "analysis/2020-11-19_01_phase/HsInv0389/1KGP_haplotypes.txt",
+         NA, "tmp/2020-11-28_02_ihplot/00_Complete/HsInv0389/")
 
 # READ OPTIONS ############################################################################################################
     args = commandArgs(trailingOnly=TRUE)
@@ -152,12 +152,18 @@ if (length(args)==0 | length(args)<6 | args[1]=="help") {
     Samples$GenotypeScore<-NA
     Samples$Genotype<-NA
     
+    Samples$Genotype<-sapply(Samples$ID,  function(x){ 
+      if( Phased[1,x] %in% c("0|0", "0")){"S"}
+      else if(Phased[1,x] %in% c("1|1", "1")){"I"}
+      else if(Phased[1,x] %in% c("1|0")){"IS"}
+      else if(Phased[1,x] %in% c("0|1")){"SI"}
+      
+    })
+    
     Samples$FullGenotype<-sapply(Samples$ID,  function(x){ 
       if( Phased[1,x] %in% c("0|0", "0")){"STD"}else if(Phased[1,x] %in% c("1|1", "1")){"INV"}else{"HET"}
       })
     
-    Samples$Genotype<-substr(Samples$FullGenotype, 1, 1)
-    Samples$Genotype[Samples$Genotype == "H"]<-"SI"
     
     
 # WRITE DATA ################################################################################

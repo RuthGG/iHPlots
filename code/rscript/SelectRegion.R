@@ -1,11 +1,11 @@
 #!/usr/bin/R
-# Carla Giner
-# 25.10.16
+# Ruth Gómez, based on another script by Carla Giner
+# 19.11.2020
 
-args = c("tmp/2020-11-19_02_ihplot/00_Complete/HsInv1057/positions.txt" ,
-         "tmp/2020-11-19_02_ihplot/00_Complete/HsInv1057/haplotypes.txt" ,
-         "tmp/2020-11-19_02_ihplot/00_Complete/HsInv1057/samples.txt",
-         2, "tmp/2020-11-19_02_ihplot/01_Region/HsInv0389/", 0)
+args = c("tmp/2020-11-28_02_ihplot/00_Complete/HsInv0389/positions.txt" ,
+         "tmp/2020-11-28_02_ihplot/00_Complete/HsInv0389/haplotypes.txt" ,
+         "tmp/2020-11-28_02_ihplot/00_Complete/HsInv0389/samples.txt",
+         2, "tmp/2020-11-28_02_ihplot/01_Region/HsInv0389", 0)
 
 
 # READ OPTIONS ############################################################################################################
@@ -51,6 +51,8 @@ args = c("tmp/2020-11-19_02_ihplot/00_Complete/HsInv1057/positions.txt" ,
 
 # SUBSET INSIDE AND NO-SINGLETON ##########################################################################################
     # Exclude less than X counts (and positions with NA in the AltCount.)
+    # Filter haplotypes to contain only accepted positions
+    Haplotypes<-Haplotypes[,Positions$ID]
     # Update AltCount in positions file, just in case
     Positions$AltCount<-apply(Haplotypes,2,function(v){sum(as.integer(v),na.rm=TRUE)})
 
@@ -75,12 +77,25 @@ args = c("tmp/2020-11-19_02_ihplot/00_Complete/HsInv1057/positions.txt" ,
     
     library(reshape2)
     library(plyr)
-    GenoCounts<-dcast(Samples,formula=list(.(HapID),.(Genotype)),value.var="HapID",fun.aggregate=length)
+    # Translate heterozygous into counts
+    Samples$Genotype_tmp<-Samples$Genotype
+    Samples[Samples$FullGenotype == "HET" & (
+              (rownames(Samples) %in% grep("_1", Samples$Sample)  & Samples$Genotype_tmp == "SI") |
+              (rownames(Samples) %in% grep("_2", Samples$Sample)  & Samples$Genotype_tmp == "IS") 
+              ), "Genotype_tmp"]<-"S"
+    Samples[Samples$FullGenotype == "HET" & (
+      (rownames(Samples) %in% grep("_2", Samples$Sample)  & Samples$Genotype_tmp == "SI") |
+        (rownames(Samples) %in% grep("_1", Samples$Sample)  & Samples$Genotype_tmp == "IS") 
+    ), "Genotype_tmp"]<-"I"
+    
+    # Make counts
+    GenoCounts<-dcast(Samples,formula=list(.(HapID),.(Genotype_tmp)),value.var="HapID",fun.aggregate=length)
     if( is.null(GenoCounts$I )){GenoCounts$I<-0}
-    if( is.null(GenoCounts$S )){GenoCounts$I<-0}
+    if( is.null(GenoCounts$S )){GenoCounts$S<-0}
     HaplotypesTable<-cbind(HaplotypesTable,GenoCounts[, c("S","I")])
-
+    Samples$Genotype_tmp <-NULL
     rownames(HaplotypesTable)<-NULL
+    
     HaplotypesTable$Shared<-apply(HaplotypesTable[,c("S","I")],1,function(v){v[1]!=0 & v[2]!=0})
 
      

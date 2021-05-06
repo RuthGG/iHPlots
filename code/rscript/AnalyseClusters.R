@@ -2,6 +2,12 @@
 # Carla Giner
 # 25.10.16
 
+# args<-c("tmp/2020-11-28_02_ihplot/01_Region/HsInv0389/PositionInfo.txt", 
+# "tmp/2020-11-28_02_ihplot/01_Region/HsInv0389/HaplotypeInfo.txt",
+# "tmp/2020-11-28_02_ihplot/01_Region/HsInv0389/SampleInfo.txt",
+#  0.6,
+# "tmp/2020-11-28_02_ihplot/02_iHPlots/HsInv0389/",
+#   "Derived",91)
 
 # READ OPTIONS ############################################################################################################
     args = commandArgs(trailingOnly=TRUE)

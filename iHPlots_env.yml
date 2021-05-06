@@ -1,0 +1,4 @@
+name: iHPlots
+channels:
+  - defaults
+prefix: /home/rgomez/anaconda3/envs/iHPlots
