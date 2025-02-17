@@ -17,19 +17,12 @@ Give project objective, description and scope
 
 ## Prerequisites
 
-This project should be associated with a conda environment of the same name. To activate it, do:
-
-```conda activate iHPlots```
+This project should be associated with a conda environment, which can be imported from the .yml file in the main directory.
 
 ## Running the tests
 
-`run_example.sh` runs the analyses with part of the data. 
 
-The analysis is divided in different parts, that are options in `runall.sh`. Each of them could have its own requirements:
-
-* `runall all` runs all the analyses.
-* `runall download` downloads available raw data (`data/raw`).
-* `runall preprocess` processes raw data to use it (`data/use`).
+The analysis is divided in different parts, that are options in `runall.sh`. Each of them could have its own requirements.
 
 ## A note on code comment structure
 
